@@ -1,27 +1,33 @@
-# Morphing One Image to Another and Saving it as a Video
+# Morphing One Image to Another and Saving it as a Video with JavaScript
 
-This guide walks you through the process of morphing one image into another using Python and MoviePy, and then saving the morph as a video. 
+This guide walks you through the process of morphing one image into another using JavaScript, along with an HTML5 Canvas, CSS for styling, and a simple backend to save the morph as a video. 
 
-The transition between images can create a smooth and visually appealing effect, perfect for slideshows, presentations, or artistic projects.
+This transition effect can be applied for a variety of purposes, such as creating animations, interactive web experiences, or artistic projects.
 
 ## Table of Contents
 
 1. [Prerequisites](#prerequisites)
 2. [Setting Up the Environment](#setting-up-the-environment)
-3. [Loading and Morphing Images](#loading-and-morphing-images)
+3. [Morphing the Images](#morphing-the-images)
 4. [Saving the Morph as a Video](#saving-the-morph-as-a-video)
-5. [Full Python Script](#full-python-script)
+5. [Full HTML, CSS, and JavaScript Code](#full-html-css-and-javascript-code)
 
 ---
 
 ## Prerequisites
 
-Before you start, ensure you have the following installed:
+Before you start, ensure you have the following:
 
-- **Python 3.x**
-- **MoviePy**: A Python library for video editing.
-  
-  To install MoviePy, run:
+- Basic knowledge of HTML5, JavaScript, and CSS.
+- Two images you want to morph, saved locally.
 
-  ```bash
-  pip install moviepy
+## Setting Up the Environment
+
+Prepare your working environment as follows:
+
+1. **Images**: Place two images in your project folder, for example:
+   - `image1.jpg`
+   - `image2.jpg`
+
+2. **Directory Structure**:
+
