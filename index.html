@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Morphing to Video</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        #canvas {
+            border: 1px solid #ccc;
+        }
+
+        .controls {
+            margin-top: 20px;
+        }
+
+        .controls button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+
+        #downloadLink {
+            display: none;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="canvas" width="500" height="500"></canvas>
+
+    <div class="controls">
+        <input type="file" id="upload1" accept="image/*">
+        <input type="file" id="upload2" accept="image/*">
+        <button id="startMorphButton">Start Morph</button>
+        <button id="recordButton">Record Morph to Video</button>
+        <a id="downloadLink" download="morph-video.webm">Download Video</a>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let img1 = new Image();
+        let img2 = new Image();
+        let alpha = 0; // Alpha for blending
+        let animationFrame;
+        let mediaRecorder;
+        let recordedChunks = [];
+
+        // Load first image
+        document.getElementById('upload1').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    img1.src = event.target.result;
+                    img1.onload = () => {
+                        if (img2.src) drawImages();
+                    };
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Load second image
+        document.getElementById('upload2').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    img2.src = event.target.result;
+                    img2.onload = () => {
+                        if (img1.src) drawImages();
+                    };
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Draw initial images
+        function drawImages() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.globalAlpha = 1;
+            ctx.drawImage(img1, 0, 0, canvas.width, canvas.height);
+        }
+
+        // Start morphing when button is clicked
+        document.getElementById('startMorphButton').addEventListener('click', function() {
+            alpha = 0; // Reset alpha
+            cancelAnimationFrame(animationFrame);
+            morphImages();
+        });
+
+        // Morph images
+        function morphImages() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.globalAlpha = 1;
+            ctx.drawImage(img1, 0, 0, canvas.width, canvas.height);
+
+            ctx.globalAlpha = alpha;
+            ctx.drawImage(img2, 0, 0, canvas.width, canvas.height);
+
+            if (alpha < 1) {
+                alpha += 0.01;  // Control speed of morphing
+                animationFrame = requestAnimationFrame(morphImages);
+            }
+        }
+
+        // Start recording morphing
+        document.getElementById('recordButton').addEventListener('click', function() {
+            const stream = canvas.captureStream(30); // Capture the canvas stream at 30fps
+            mediaRecorder = new MediaRecorder(stream, { mimeType: 'video/webm' });
+
+            mediaRecorder.ondataavailable = function (event) {
+                if (event.data.size > 0) {
+                    recordedChunks.push(event.data);
+                }
+            };
+
+            mediaRecorder.onstop = function () {
+                const blob = new Blob(recordedChunks, { type: 'video/webm' });
+                const url = URL.createObjectURL(blob);
+                const downloadLink = document.getElementById('downloadLink');
+                downloadLink.href = url;
+                downloadLink.style.display = 'inline'; // Show download link
+            };
+
+            recordedChunks = [];
+            mediaRecorder.start();
+
+            document.getElementById('startMorphButton').click(); // Start morph animation
+
+            setTimeout(() => {
+                mediaRecorder.stop(); // Stop recording after 5 seconds
+            }, 5000); // Adjust time if needed
+        });
+
+    </script>
+
+</body>
+</html>
